@@ -157,7 +157,7 @@ auto_scale_lr = dict(base_batch_size=16)
 vis_backends = [
     dict(type='LocalVisBackend'),
     dict(type='WandbVisBackend',
-         init_kwargs=dict(project='neurocle', tags=['detr', 'mnm']),)
+         init_kwargs=dict(project='neurocle', tags=['det', 'detr', 'mnm']),)
 ]
 visualizer = dict(
     type='DetLocalVisualizer', vis_backends=vis_backends, name='visualizer')

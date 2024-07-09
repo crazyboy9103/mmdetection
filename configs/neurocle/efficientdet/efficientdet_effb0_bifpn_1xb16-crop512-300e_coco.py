@@ -149,7 +149,7 @@ train_cfg = dict(max_epochs=max_epochs, val_interval=1)
 vis_backends = [
     dict(type='LocalVisBackend'),
     dict(type='WandbVisBackend',
-         init_kwargs=dict(project='neurocle', tags=['efficientdet', 'coco']),)
+         init_kwargs=dict(project='neurocle', tags=['det', 'efficientdet', 'coco']),)
 ]
 visualizer = dict(
     type='DetLocalVisualizer', vis_backends=vis_backends, name='visualizer')

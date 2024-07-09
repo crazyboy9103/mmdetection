@@ -77,7 +77,7 @@ optim_wrapper = dict(
 vis_backends = [
     dict(type='LocalVisBackend'),
     dict(type='WandbVisBackend',
-         init_kwargs=dict(project='neurocle', tags=['nas_fcos', 'mnm']),)
+         init_kwargs=dict(project='neurocle', tags=['det', 'nas_fcos', 'mnm']),)
 ]
 visualizer = dict(
     type='DetLocalVisualizer', vis_backends=vis_backends, name='visualizer')
