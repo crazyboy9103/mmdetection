@@ -96,12 +96,7 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args={{_base_.backend_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(
-        type='RandomResize',
-        scale=(image_size, image_size),
-        ratio_range=(0.1, 2.0),
-        keep_ratio=True),
-    dict(type='RandomCrop', crop_size=(image_size, image_size)),
+    dict(type='Resize', scale=(image_size, image_size), keep_ratio=True),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PackDetInputs')
 ]
@@ -170,3 +165,5 @@ env_cfg = dict(cudnn_benchmark=True)
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (8 GPUs) x (16 samples per GPU)
 auto_scale_lr = dict(base_batch_size=128)
+
+# load_from="/mmdetection/configs/neurocle/efficientdet/efficientdet-d0-mmdet.pth"
