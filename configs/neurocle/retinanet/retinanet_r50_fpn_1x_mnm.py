@@ -22,5 +22,3 @@ model = dict(
         num_classes=6
     )
 )
-
-load_from="https://download.openmmlab.com/mmdetection/v2.0/retinanet/retinanet_r50_fpn_1x_coco/retinanet_r50_fpn_1x_coco_20200130-c2398f9e.pth"

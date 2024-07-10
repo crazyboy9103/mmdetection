@@ -121,3 +121,7 @@ work_dirs/
 *.pth
 *.py~
 *.sh~
+
+!efficientdet-d0-mmdet.pth
+efficientdet-d0.tar.gz
+efficientdet-d0/
