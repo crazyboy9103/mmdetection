@@ -3,6 +3,7 @@ import argparse
 import tempfile
 from functools import partial
 from pathlib import Path
+import time
 
 import numpy as np
 import torch
@@ -104,12 +105,37 @@ def inference(args, logger):
         avg_flops.append(outputs['flops'])
         params = outputs['params']
         result['compute_type'] = 'dataloader: load a picture from the dataset'
+
+    time_list = []
+    
+    for idx, data_batch in enumerate(data_loader):
+        if idx == args.num_images:
+            break
+        data = model.data_preprocessor(data_batch)
+        result['ori_shape'] = data['data_samples'][0].ori_shape
+        result['pad_shape'] = data['data_samples'][0].pad_shape
+        if hasattr(data['data_samples'][0], 'batch_input_shape'):
+            result['pad_shape'] = data['data_samples'][0].batch_input_shape
+        model.forward = partial(_forward, data_samples=data['data_samples'])
+
+        with torch.no_grad():
+            tic = time.perf_counter()
+            torch.cuda.synchronize()
+            model(data['inputs'])
+            torch.cuda.synchronize()
+            toc = time.perf_counter()
+            time_list.append(toc - tic)
+
     del data_loader
+
+    time_list = np.array(time_list)
+    fps = 1 / time_list
 
     mean_flops = _format_size(int(np.average(avg_flops)))
     params = _format_size(params)
     result['flops'] = mean_flops
     result['params'] = params
+    result['FPS'] = f"{np.mean(fps):.2f}±{np.std(fps):.2f}"
 
     return result
 
@@ -124,13 +150,13 @@ def main():
     flops = result['flops']
     params = result['params']
     compute_type = result['compute_type']
-
+    fps = result['FPS']
     if pad_shape != ori_shape:
         print(f'{split_line}\nUse size divisor set input shape '
               f'from {ori_shape} to {pad_shape}')
     print(f'{split_line}\nCompute type: {compute_type}\n'
           f'Input shape: {pad_shape}\nFlops: {flops}\n'
-          f'Params: {params}\n{split_line}')
+          f'Params: {params}\nFPS: {fps} (GPU)\n{split_line}')
     print('!!!Please be cautious if you use the results in papers. '
           'You may need to check if all ops are supported and verify '
           'that the flops computation is correct.')
