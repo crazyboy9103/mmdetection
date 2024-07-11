@@ -1,12 +1,12 @@
 custom_imports = dict(
     imports=['projects.EfficientDet.efficientdet'], allow_failed_imports=False)
 
-image_size = 512
+image_size = 896
 batch_augments = [
     dict(type='BatchFixedSizePad', size=(image_size, image_size))
 ]
 norm_cfg = dict(type='SyncBN', requires_grad=True, eps=1e-3, momentum=0.01)
-checkpoint = 'https://download.openmmlab.com/mmclassification/v0/efficientnet/efficientnet-b0_3rdparty_8xb32-aa-advprop_in1k_20220119-26434485.pth'  # noqa
+checkpoint = 'https://download.openmmlab.com/mmclassification/v0/efficientnet/efficientnet-b3_3rdparty_8xb32-aa-advprop_in1k_20220119-53b41118.pth'
 model = dict(
     type='EfficientDet',
     data_preprocessor=dict(
@@ -15,11 +15,12 @@ model = dict(
         std=[58.395, 57.12, 57.375],
         bgr_to_rgb=True,
         pad_size_divisor=image_size,
-        batch_augments=batch_augments),
+        batch_augments=batch_augments
+        ),
     backbone=dict(
         type='EfficientNet',
-        arch='b0',
-        drop_path_rate=0.2,
+        arch='b3',
+        drop_path_rate=0.3,
         out_indices=(3, 4, 5),
         frozen_stages=0,
         conv_cfg=dict(type='Conv2dSamePadding'),
@@ -29,18 +30,18 @@ model = dict(
             type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
     neck=dict(
         type='BiFPN',
-        num_stages=3,
-        in_channels=[40, 112, 320],
-        out_channels=64,
+        num_stages=6,
+        in_channels=[48, 136, 384],
+        out_channels=160,
         start_level=0,
         norm_cfg=norm_cfg),
     bbox_head=dict(
         type='EfficientDetSepBNHead',
         num_classes=80,
         num_ins=5,
-        in_channels=64,
-        feat_channels=64,
-        stacked_convs=3,
+        in_channels=160,
+        feat_channels=160,
+        stacked_convs=4,
         norm_cfg=norm_cfg,
         anchor_generator=dict(
             type='AnchorGenerator',
@@ -85,4 +86,4 @@ model = dict(
             method='gaussian'),
         max_per_img=100))
 
-load_from="/mmdetection/configs/neurocle/efficientdet/efficientdet-d0-mmdet.pth"
+load_from="https://download.openmmlab.com/mmdetection/v3.0/efficientdet/efficientdet_effb3_bifpn_8xb16-crop896-300e_coco/efficientdet_effb3_bifpn_8xb16-crop896-300e_coco_20230223_122457-e6f7a833.pth"
