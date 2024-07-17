@@ -1,6 +1,9 @@
 model = dict(
-    type='DETR',
+    type='DeformableDETR',
     num_queries=300,
+    num_feature_levels=4,
+    with_box_refine=False,
+    as_two_stage=False,
     data_preprocessor=dict(
         type='DetDataPreprocessor',
         mean=[123.675, 116.28, 103.53],
@@ -11,7 +14,7 @@ model = dict(
         type='ResNet',
         depth=50,
         num_stages=4,
-        out_indices=(3, ),
+        out_indices=(1, 2, 3),
         frozen_stages=1,
         norm_cfg=dict(type='BN', requires_grad=False),
         norm_eval=True,
@@ -19,57 +22,46 @@ model = dict(
         init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
     neck=dict(
         type='ChannelMapper',
-        in_channels=[2048],
+        in_channels=[512, 1024, 2048],
         kernel_size=1,
         out_channels=256,
         act_cfg=None,
-        norm_cfg=None,
-        num_outs=1),
-    encoder=dict(  # DetrTransformerEncoder
+        norm_cfg=dict(type='GN', num_groups=32),
+        num_outs=4),
+    encoder=dict(  # DeformableDetrTransformerEncoder
         num_layers=6,
-        layer_cfg=dict(  # DetrTransformerEncoderLayer
+        layer_cfg=dict(  # DeformableDetrTransformerEncoderLayer
+            self_attn_cfg=dict(  # MultiScaleDeformableAttention
+                embed_dims=256,
+                batch_first=True),
+            ffn_cfg=dict(
+                embed_dims=256, feedforward_channels=1024, ffn_drop=0.1))),
+    decoder=dict(  # DeformableDetrTransformerDecoder
+        num_layers=6,
+        return_intermediate=True,
+        layer_cfg=dict(  # DeformableDetrTransformerDecoderLayer
             self_attn_cfg=dict(  # MultiheadAttention
                 embed_dims=256,
                 num_heads=8,
                 dropout=0.1,
                 batch_first=True),
-            ffn_cfg=dict(
+            cross_attn_cfg=dict(  # MultiScaleDeformableAttention
                 embed_dims=256,
-                feedforward_channels=2048,
-                num_fcs=2,
-                ffn_drop=0.1,
-                act_cfg=dict(type='ReLU', inplace=True)))),
-    decoder=dict(  # DetrTransformerDecoder
-        num_layers=6,
-        layer_cfg=dict(  # DetrTransformerDecoderLayer
-            self_attn_cfg=dict(  # MultiheadAttention
-                embed_dims=256,
-                num_heads=8,
-                dropout=0.1,
-                batch_first=True),
-            cross_attn_cfg=dict(  # MultiheadAttention
-                embed_dims=256,
-                num_heads=8,
-                dropout=0.1,
                 batch_first=True),
             ffn_cfg=dict(
-                embed_dims=256,
-                feedforward_channels=2048,
-                num_fcs=2,
-                ffn_drop=0.1,
-                act_cfg=dict(type='ReLU', inplace=True))),
-        return_intermediate=True),
-    positional_encoding=dict(num_feats=128, normalize=True),
+                embed_dims=256, feedforward_channels=1024, ffn_drop=0.1)),
+        post_norm_cfg=None),
+    positional_encoding=dict(num_feats=128, normalize=True, offset=-0.5),
     bbox_head=dict(
-        type='DETRHead',
+        type='DeformableDETRHead',
         num_classes=80,
-        embed_dims=256,
+        sync_cls_avg_factor=True,
         loss_cls=dict(
-            type='CrossEntropyLoss',
-            bg_cls_weight=0.1,
-            use_sigmoid=False,
-            loss_weight=1.0,
-            class_weight=1.0),
+            type='FocalLoss',
+            use_sigmoid=True,
+            gamma=2.0,
+            alpha=0.25,
+            loss_weight=2.0),
         loss_bbox=dict(type='L1Loss', loss_weight=5.0),
         loss_iou=dict(type='GIoULoss', loss_weight=2.0)),
     # training and testing settings
@@ -77,10 +69,10 @@ model = dict(
         assigner=dict(
             type='HungarianAssigner',
             match_costs=[
-                dict(type='ClassificationCost', weight=1.),
+                dict(type='FocalLossCost', weight=2.0),
                 dict(type='BBoxL1Cost', weight=5.0, box_format='xywh'),
                 dict(type='IoUCost', iou_mode='giou', weight=2.0)
             ])),
     test_cfg=dict(max_per_img=100))
 
-load_from="https://download.openmmlab.com/mmdetection/v3.0/detr/detr_r50_8xb2-150e_coco/detr_r50_8xb2-150e_coco_20221023_153551-436d03e8.pth"
+load_from = "https://download.openmmlab.com/mmdetection/v3.0/deformable_detr/deformable-detr_r50_16xb2-50e_coco/deformable-detr_r50_16xb2-50e_coco_20221029_210934-6bc7d21b.pth"

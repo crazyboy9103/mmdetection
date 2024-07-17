@@ -13,7 +13,6 @@ model = dict(
 
 # optimizer
 optim_wrapper = dict(
-    optimizer=dict(type='SGD', lr=0.01, weight_decay=4e-5, momentum=0.9),
     paramwise_cfg=dict(bias_lr_mult=2., bias_decay_mult=0.))
 
 vis_backends = [

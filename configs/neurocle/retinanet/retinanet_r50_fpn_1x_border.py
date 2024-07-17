@@ -5,10 +5,6 @@ _base_ = [
     # './retinanet_tta.py'
 ]
 
-# optimizer
-optim_wrapper = dict(
-    optimizer=dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001))
-
 vis_backends = [
     dict(type='LocalVisBackend'),
     dict(type='WandbVisBackend',

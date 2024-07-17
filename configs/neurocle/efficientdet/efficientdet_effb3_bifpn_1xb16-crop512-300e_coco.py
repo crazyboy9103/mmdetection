@@ -6,8 +6,6 @@ _base_ = [
 ]
 
 optim_wrapper = dict(
-    type='OptimWrapper',
-    optimizer=dict(type='SGD', lr=0.16, weight_decay=4e-5, momentum=0.9),
     paramwise_cfg=dict(
         norm_decay_mult=0, bias_decay_mult=0, bypass_duplicate=True),
     clip_grad=dict(max_norm=10, norm_type=2))
@@ -52,11 +50,13 @@ test_pipeline = [
 ]
 
 train_dataloader = dict(
+    batch_size=4,
     dataset=dict(
         pipeline=train_pipeline
     )
 )
 val_dataloader = dict(
+    batch_size=4,
     dataset=dict(
         pipeline=test_pipeline
     )
