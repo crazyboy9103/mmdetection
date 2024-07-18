@@ -5,7 +5,7 @@ default_hooks = dict(
     logger=dict(type='LoggerHook', interval=50),
     param_scheduler=dict(type='ParamSchedulerHook'),
     checkpoint=dict(type='CheckpointHook', interval=1, save_best=['coco/bbox_mAP'], rule='greater', max_keep_ckpts=1, save_last=False),
-    early_stopping=dict(type='EarlyStoppingHook', monitor='coco/bbox_mAP', min_delta=0.1, patience=5, rule='greater'),
+    # early_stopping=dict(type='EarlyStoppingHook', monitor='coco/bbox_mAP', min_delta=0.1, patience=5, rule='greater'),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='DetVisualizationHook')
 )

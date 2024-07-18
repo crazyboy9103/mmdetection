@@ -14,12 +14,14 @@ model = dict(
 # optimizer
 optim_wrapper = dict(
     clip_grad=dict(max_norm=0.1, norm_type=2),
+    optimizer=dict(lr=2e-4),
     paramwise_cfg=dict(
         custom_keys={
-            'backbone': dict(lr_mult=0.1),
-            # 'sampling_offsets': dict(lr_mult=0.1),
-            # 'reference_points': dict(lr_mult=0.1)
-        }))
+            'backbone': dict(lr_mult=0.2),
+            'sampling_offsets': dict(lr_mult=0.1),
+            'reference_points': dict(lr_mult=0.1)
+        })
+    )
 
 vis_backends = [
     dict(type='LocalVisBackend'),
