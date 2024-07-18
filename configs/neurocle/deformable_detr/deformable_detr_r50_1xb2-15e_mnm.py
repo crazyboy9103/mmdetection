@@ -7,7 +7,7 @@ _base_ = [
 
 model = dict(
     bbox_head = dict(
-        num_classes = 1
+        num_classes = 6
     )
 )
 
