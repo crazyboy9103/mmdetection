@@ -1,4 +1,4 @@
-max_epochs=12
+max_epochs=30
 # training schedule for 1x
 train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
 val_cfg = dict(type='ValLoop')
@@ -13,8 +13,16 @@ param_scheduler = [
         begin=0,
         end=max_epochs,
         by_epoch=True,
-        milestones=[8],
-        gamma=0.1)
+        milestones=[8, 16, 24],
+        gamma=0.8),
+    # dict(
+    #     type='ReduceOnPlateauLR',
+    #     monitor='coco/bbox_mAP',
+    #     rule='greater',
+    #     factor=0.8,
+    #     patience=0,
+    #     min_value=1e-5
+    # ),
 ]
 
 optim_wrapper = dict(

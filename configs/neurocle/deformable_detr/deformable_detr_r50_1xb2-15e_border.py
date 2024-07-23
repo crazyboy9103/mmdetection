@@ -11,6 +11,18 @@ model = dict(
     )
 )
 
+# learning rate
+param_scheduler = [
+    dict(
+        type='ReduceOnPlateauLR',
+        monitor='coco/bbox_mAP',
+        rule='greater',
+        factor=0.5,
+        patience=1,
+        min_value=1e-5
+    ),
+]
+
 # optimizer
 optim_wrapper = dict(
     clip_grad=dict(max_norm=0.1, norm_type=2),

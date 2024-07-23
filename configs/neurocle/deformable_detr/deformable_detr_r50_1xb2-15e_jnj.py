@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/border.py', 
+    '../_base_/datasets/jnj.py', 
     '../_base_/models/deformable_detr_r50.py',
     '../_base_/default_runtime.py',
     '../_base_/schedules/schedule_1x.py'
@@ -10,6 +10,18 @@ model = dict(
         num_classes = 23
     )
 )
+
+# learning rate
+param_scheduler = [
+    dict(
+        type='ReduceOnPlateauLR',
+        monitor='coco/bbox_mAP',
+        rule='greater',
+        factor=0.8,
+        patience=0,
+        min_value=1e-5
+    ),
+]
 
 # optimizer
 optim_wrapper = dict(
