@@ -54,13 +54,13 @@ test_pipeline = [
 ]
 
 train_dataloader = dict(
-    batch_size=8,
+    batch_size=4,
     dataset=dict(
         pipeline=train_pipeline
     )
 )
 val_dataloader = dict(
-    batch_size=8,
+    batch_size=4,
     dataset=dict(
         pipeline=test_pipeline
     )
